@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="style.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+<div id="login-content" class="content">
+    <h1>Login</h1>
+    <form id="login-form" onsubmit="return false;">
+        <input type="text" name="email"><br>
+        <input type="text" name="password"><br>
+        <button id="login-button">Login</button>
+    </form>
+</div>
+
+<div id="register-content" class="content">
+    <h1>Register</h1>
+    <form id="register-form" onsubmit="return false;">
+        <input type="text" name="email"><br>
+        <input type="text" name="password"><br>
+        <button id="register-button">Register</button>
+    </form>
+</div>
+
+<div id="guest-content" class="content">
+        <button id="guest-button">Guest</button>
+</div>
+
+<div id="welcome-content" class="hidden content">
+    <h1>Welcome</h1>
+</div>
+
+<script>
+
+    const OK = 200;
+    const BAD_REQUEST = 400;
+    const UNAUTHORIZED = 401;
+    const NOT_FOUND = 404;
+    const INTERNAL_SERVER_ERROR = 500;
+
+    let loginContentDivEl;
+    let welcomeContentDivEl;
+    let registerContentDivEl;
+    let guestContentDivEl;
+
+    document.addEventListener('DOMContentLoaded', onLoad);
+
+    function onLoad() {
+        loginContentDivEl = document.getElementById('login-content');
+        welcomeContentDivEl = document.getElementById('welcome-content');
+        registerContentDivEl = document.getElementById('register-content');
+
+        const registerButtonEl = document.getElementById('register-button');
+        registerButtonEl.addEventListener('click', onRegisterButtonClicked);
+        getCurrentUser();
+
+        const loginButtonEl = document.getElementById('login-button');
+        loginButtonEl.addEventListener('click', onLoginButtonClicked);
+
+        guestContentDivEl = document.getElementById('guest-content');
+        guestContentDivEl.addEventListener('click', onGuestButtonClicked);
+
+    }
+
+    function onGuestButtonClicked() {
+        const params = new URLSearchParams();
+        params.append('email', 'Guest');
+        params.append('password', '');
+
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', onLoginResponse);
+        xhr.addEventListener('error', onNetworkError);
+        xhr.open('POST', 'login');
+        xhr.send(params);
+    }
+
+    function showContents(ids) {
+        const contentEls = document.getElementsByClassName('content');
+        for (let i = 0; i < contentEls.length; i++) {
+            const contentEl = contentEls[i];
+            if (ids.includes(contentEl.id)) {
+                contentEl.classList.remove('hidden');
+            } else {
+                contentEl.classList.add('hidden');
+            }
+        }
+    }
+    function getCurrentUser() {
+        return JSON.parse(localStorage.getItem('user'));
+    }
+
+    function onRegisterButtonClicked() {
+        const registerFormEl = document.forms['register-form'];
+
+        const emailInputEl = registerFormEl.querySelector('input[name="email"]');
+        const passwordInputEl = registerFormEl.querySelector('input[name="password"]');
+
+        const email = emailInputEl.value;
+        const password = passwordInputEl.value;
+
+        const params = new URLSearchParams();
+        params.append('email', email);
+        params.append('password', password);
+
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', onRegisterResponse);
+        xhr.addEventListener('error', onNetworkError);
+        xhr.open('POST', 'register');
+        xhr.send(params);
+    }
+
+    function onRegisterResponse() {
+        if (this.status === OK) {
+            const user = JSON.parse(this.responseText);
+            alert('Thank you for registering  !')
+            showContents(['login-content']);
+        } else {
+            onOtherResponse(document.getElementById('register-form'), this);
+        }
+    }
+    function onOtherResponse(targetEl, xhr) {
+        if (xhr.status === NOT_FOUND) {
+            newError(targetEl, 'Not found');
+            console.error(xhr);
+        } else {
+            const json = JSON.parse(xhr.responseText);
+            if (xhr.status === INTERNAL_SERVER_ERROR) {
+                newError(targetEl, `Server error: ${json.message}`);
+            } else if (xhr.status === UNAUTHORIZED || xhr.status === BAD_REQUEST) {
+                newError(targetEl, json.message);
+            } else {
+                newError(targetEl, `Unknown error: ${json.message}`);
+            }
+        }
+    }
+    function newError(targetEl, message) {
+        newMessage(targetEl, 'error', message);
+    }
+
+    function newMessage(targetEl, cssClass, message) {
+        clearMessages();
+
+        const pEl = document.createElement('p');
+        pEl.classList.add('message');
+        pEl.classList.add(cssClass);
+        pEl.textContent = message;
+
+        targetEl.appendChild(pEl);
+    }
+
+    function clearMessages() {
+        const messageEls = document.getElementsByClassName('message');
+        for (let i = 0; i < messageEls.length; i++) {
+            const messageEl = messageEls[i];
+            messageEl.remove();
+        }
+    }
+    function onNetworkError(response) {
+        document.body.remove();
+        const bodyEl = document.createElement('body');
+        document.appendChild(bodyEl);
+        newError(bodyEl, 'Network error, please try reloading the page');
+    }
+
+
+
+
+    function onLoginResponse() {
+        if (this.status === OK) {
+            const user = JSON.parse(this.responseText);
+            setAuthorization(user);
+            showContents('welcome-content')
+            // onProfileLoad(user);
+        } else {
+            onOtherResponse(document.getElementById('login-form'), this);
+        }
+    }
+
+    function onLoginButtonClicked() {
+        const loginFormEl = document.forms['login-form'];
+
+        const emailInputEl = loginFormEl.querySelector('input[name="email"]');
+        const passwordInputEl = loginFormEl.querySelector('input[name="password"]');
+
+        const email = emailInputEl.value;
+        const password = passwordInputEl.value;
+
+        const params = new URLSearchParams();
+        params.append('email', email);
+        params.append('password', password);
+
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', onLoginResponse);
+        xhr.addEventListener('error', onNetworkError);
+        xhr.open('POST', 'login');
+
+        xhr.send(params);
+    }
+
+
+    function setAuthorization(user) {
+        return localStorage.setItem('user', JSON.stringify(user));
+    }
+
+
+</script>
+
+</body>
+</html>

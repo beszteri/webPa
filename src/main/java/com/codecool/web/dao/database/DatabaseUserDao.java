@@ -1,6 +1,7 @@
 package com.codecool.web.dao.database;
 
 import com.codecool.web.dao.UserDao;
+import com.codecool.web.model.Role;
 import com.codecool.web.model.User;
 
 import java.sql.*;
@@ -18,14 +19,18 @@ public final class DatabaseUserDao extends AbstractDao implements UserDao {
         String email = resultset.getString("email");
         String password = resultset.getString("password");
         int balance = resultset.getInt("balance");
-        return new User(id, email, password, balance);
+        Role role = Role.valueOf(resultset.getString("role"));
+        System.out.println(email + password + balance + role);
+        return new User(id, email, password, balance, role);
     }
 
     @Override
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM users WHERE email=?";
+        System.out.println("előtt");
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
+            System.out.println("után");
             try (ResultSet resultSet = statement.executeQuery()) {
                 if(resultSet.next()) {
                     return fetchUser(resultSet);
@@ -78,18 +83,19 @@ public final class DatabaseUserDao extends AbstractDao implements UserDao {
     }
 
     @Override
-    public User addUser(String email, String password, int balance) throws SQLException {
+    public User addUser(String email, String password, int balance, Role role) throws SQLException {
         boolean autoCommit = connection.getAutoCommit();
         connection.setAutoCommit(false);
-        String sql = "INSERT INTO users(email, password, balance) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users(email, password, balance, role) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, email);
             statement.setString(2, password);
             statement.setInt(3, balance);
+            statement.setString(4, role.getValue().toUpperCase());
             executeInsert(statement);
             int id = fetchGeneratedId(statement);
             connection.commit();
-            return new User(id, email, password, balance);
+            return new User(id, email, password, balance, role);
         } catch (SQLException e) {
             connection.rollback();
             throw e;

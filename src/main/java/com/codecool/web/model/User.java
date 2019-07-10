@@ -7,12 +7,14 @@ public final class User extends AbstractModel {
     private String email;
     private String password;
     private int balance;
+    private Role role;
 
-    public User(int id, String email, String password, int balance) {
+    public User(int id, String email, String password, int balance, Role role) {
         super(id);
         this.email = email;
         this.password = password;
         this.balance = balance;
+        this.role = role;
     }
 
 
@@ -29,6 +31,10 @@ public final class User extends AbstractModel {
         return balance;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -37,11 +43,12 @@ public final class User extends AbstractModel {
         User user = (User) o;
         return balance == user.balance &&
             Objects.equals(email, user.email) &&
-            Objects.equals(password, user.password);
+            Objects.equals(password, user.password) &&
+            role == user.role;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), email, password, balance);
+        return Objects.hash(super.hashCode(), email, password, balance, role);
     }
 }
