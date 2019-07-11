@@ -14,7 +14,8 @@
     <form id="login-form" onsubmit="return false;">
         <input type="text" name="email"><br>
         <input type="text" name="password"><br>
-        <button id="login-button">Login</button>
+        <button id="login-button">Login</button><br>
+        <button id="guest-button">Guest</button>
     </form>
 </div>
 
@@ -27,20 +28,37 @@
     </form>
 </div>
 
-<div id="guest-content" class="content">
-        <button id="guest-button">Guest</button>
+<div id="guest-content" class="hidden content">
+    <button id="back-to-login-page">Back to login page</button>
+</div>
+
+<div id="guest-loaded-content" class="hidden content">
 </div>
 
 <div id="welcome-content" class="hidden content">
     <h1>Welcome</h1>
-    <button id="games-button">Load games</button>
-    <button id="profile-button">My profile</button>
-    <button id="mainpage-button">Main Page</button>
+    <button id="games-button" >Load games</button>
+    <button id="profile-button" >My profile</button>
+    <button id="mainpage-button" >Main Page</button>
+    <button id="logout-button">Logout</button>
 </div>
 
 <div id="games-content" class="hidden content"></div>
 
 <div id="profile-content" class="hidden content">
+    <button id="change-profile-button">Change profil infos</button>
+</div>
+
+<div id="change-profile-infos-content" class="hidden content">
+    <br>
+    <h2>If you want to update your profile infos, please fill the field below</h2>
+    <br>
+    <form id="change-profile-infos-form" onsubmit="return false;">
+        <input type="text" name="name" placeholder="name"><br>
+        <input type="text" name="address" placeholder="address"><br>
+        <input type="text" name="phoneNumber" placeholder="phone number"><br>
+        <button id="change-profile-infos-button">Change profile infos</button>
+    </form>
 </div>
 
 
@@ -59,7 +77,6 @@
     let guestContentDivEl;
     let profileContentDivEl;
 
-
     document.addEventListener('DOMContentLoaded', onLoad);
 
     function onLoad() {
@@ -68,6 +85,8 @@
         registerContentDivEl = document.getElementById('register-content');
         profileContentDivEl = document.getElementById('profile-content');
 
+        const changeProfileButtonEl = document.getElementById('change-profile-infos-button');
+        changeProfileButtonEl.addEventListener('click', onChangeProfileInfosButtonClicked);
 
         const gamesButtonEl = document.getElementById('games-button');
         gamesButtonEl.addEventListener('click', loadGames);
@@ -79,207 +98,313 @@
         registerButtonEl.addEventListener('click', onRegisterButtonClicked);
         getCurrentUser();
 
+        const logoutButtonEl = document.getElementById('logout-button');
+        logoutButtonEl.addEventListener('click', onLogoutButtonClicked);
+
         const profileButtonEl = document.getElementById('profile-button');
         profileButtonEl.addEventListener('click', onProfileButtonClicked);
 
         const loginButtonEl = document.getElementById('login-button');
         loginButtonEl.addEventListener('click', onLoginButtonClicked);
 
-        guestContentDivEl = document.getElementById('guest-content');
-        guestContentDivEl.addEventListener('click', onGuestButtonClicked);
+        const guestButtonEl = document.getElementById('guest-button');
+        guestButtonEl.addEventListener('click', onGuestButtonClicked);
 
-    }
+        const backToLoginPageButtonEl = document.getElementById('back-to-login-page');
+        backToLoginPageButtonEl.addEventListener('click', showLoginScreen);
 
-    function onGuestButtonClicked() {
-        const params = new URLSearchParams();
-        params.append('email', 'Guest');
-        params.append('password', '');
-
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', onLoginResponse);
-        xhr.addEventListener('error', onNetworkError);
-        xhr.open('POST', 'login');
-        xhr.send(params);
-    }
-
-    function showContents(ids) {
-        const contentEls = document.getElementsByClassName('content');
-        for (let i = 0; i < contentEls.length; i++) {
-            const contentEl = contentEls[i];
-            if (ids.includes(contentEl.id)) {
-                contentEl.classList.remove('hidden');
-            } else {
-                contentEl.classList.add('hidden');
-            }
-        }
-    }
-    function getCurrentUser() {
-        return JSON.parse(localStorage.getItem('user'));
-    }
-
-    function onRegisterButtonClicked() {
-        const registerFormEl = document.forms['register-form'];
-
-        const emailInputEl = registerFormEl.querySelector('input[name="email"]');
-        const passwordInputEl = registerFormEl.querySelector('input[name="password"]');
-
-        const email = emailInputEl.value;
-        const password = passwordInputEl.value;
-
-        const params = new URLSearchParams();
-        params.append('email', email);
-        params.append('password', password);
-
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', onRegisterResponse);
-        xhr.addEventListener('error', onNetworkError);
-        xhr.open('POST', 'register');
-        xhr.send(params);
-    }
-
-    function onRegisterResponse() {
-        if (this.status === OK) {
-            const user = JSON.parse(this.responseText);
-            alert('Thank you for registering  !')
+        /*getCurrentUser();
+        if (hasAuthorization()) {
+            onProfileLoad(getCurrentUser());
+        } else {
             showContents(['login-content']);
-        } else {
-            onOtherResponse(document.getElementById('register-form'), this);
+        }*/
+    }
+
+    /*function onProfileLoad(user) {
+        if (user.role === 'ADMIN') {
+
+        } else if (user.role === 'REGISTERED') {
+
+        } else if (user.role === 'UNREGISTERED') {
+
         }
     }
-    function onOtherResponse(targetEl, xhr) {
-        if (xhr.status === NOT_FOUND) {
-            newError(targetEl, 'Not found');
-            console.error(xhr);
-        } else {
-            const json = JSON.parse(xhr.responseText);
-            if (xhr.status === INTERNAL_SERVER_ERROR) {
-                newError(targetEl, `Server error: ${json.message}`);
-            } else if (xhr.status === UNAUTHORIZED || xhr.status === BAD_REQUEST) {
-                newError(targetEl, json.message);
-            } else {
-                newError(targetEl, `Unknown error: ${json.message}`);
+
+        function hasAuthorization() {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('error', onNetworkError);
+            xhr.open('GET', 'protected/profileInfos');
+            xhr.send();
+            if (xhr.status === OK) {
+                return true;
+            }
+        }*/
+
+        function onGuestButtonClicked() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'games');
+            xhr.onload = function () {
+                if (this.status == OK) {
+                    let games = JSON.parse(this.responseText);
+                    let output = '';
+                    for (var i in games) {
+                        output += '<div id="games-content" class="content games">' +
+                            '<img src="' + games[i].imageUrl + '" width="150" height="150">' +
+                            '<ul>' +
+                            '<li>Name: ' + games[i].name + '</li>' +
+                            '<li>Platform: ' + games[i].platform + '</li>' +
+                            '<li>Price: ' + games[i].price + '</li>' +
+                            '<li><button id="buy-game" content="' + games[i].id + '">Buy game</button> </li>' +
+                            '</ul>' +
+                            '</div>';
+                    }
+                    document.getElementById('guest-loaded-content').innerHTML = output;
+                }
+            }
+            showContents(['guest-loaded-content', 'guest-content'])
+            xhr.send();
+        }
+
+        function showContents(ids) {
+            const contentEls = document.getElementsByClassName('content');
+            for (let i = 0; i < contentEls.length; i++) {
+                const contentEl = contentEls[i];
+                if (ids.includes(contentEl.id)) {
+                    contentEl.classList.remove('hidden');
+                } else {
+                    contentEl.classList.add('hidden');
+                }
             }
         }
-    }
-    function newError(targetEl, message) {
-        newMessage(targetEl, 'error', message);
-    }
-
-    function newMessage(targetEl, cssClass, message) {
-        clearMessages();
-
-        const pEl = document.createElement('p');
-        pEl.classList.add('message');
-        pEl.classList.add(cssClass);
-        pEl.textContent = message;
-
-        targetEl.appendChild(pEl);
-    }
-
-    function clearMessages() {
-        const messageEls = document.getElementsByClassName('message');
-        for (let i = 0; i < messageEls.length; i++) {
-            const messageEl = messageEls[i];
-            messageEl.remove();
+        function showLoginScreen() {
+            showContents(['login-content', 'register-content']);
         }
-    }
-    function onNetworkError(response) {
-        document.body.remove();
-        const bodyEl = document.createElement('body');
-        document.appendChild(bodyEl);
-        newError(bodyEl, 'Network error, please try reloading the page');
-    }
 
-
-
-
-    function onLoginResponse() {
-        if (this.status === OK) {
-            const user = JSON.parse(this.responseText);
-            setAuthorization(user);
-            showContents('welcome-content')
-            // onProfileLoad(user);
-        } else {
-            onOtherResponse(document.getElementById('login-form'), this);
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('user'));
         }
-    }
 
-    function onLoginButtonClicked() {
-        const loginFormEl = document.forms['login-form'];
+        function onRegisterButtonClicked() {
+            const registerFormEl = document.forms['register-form'];
 
-        const emailInputEl = loginFormEl.querySelector('input[name="email"]');
-        const passwordInputEl = loginFormEl.querySelector('input[name="password"]');
+            const emailInputEl = registerFormEl.querySelector('input[name="email"]');
+            const passwordInputEl = registerFormEl.querySelector('input[name="password"]');
 
-        const email = emailInputEl.value;
-        const password = passwordInputEl.value;
+            const email = emailInputEl.value;
+            const password = passwordInputEl.value;
 
-        const params = new URLSearchParams();
-        params.append('email', email);
-        params.append('password', password);
+            const params = new URLSearchParams();
+            params.append('email', email);
+            params.append('password', password);
 
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', onLoginResponse);
-        xhr.addEventListener('error', onNetworkError);
-        xhr.open('POST', 'login');
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', onRegisterResponse);
+            xhr.addEventListener('error', onNetworkError);
+            xhr.open('POST', 'register');
+            xhr.send(params);
+        }
 
-        xhr.send(params);
-    }
+        function onRegisterResponse() {
+            if (this.status === OK) {
+                const user = JSON.parse(this.responseText);
+                alert('Thank you for registering  !')
+                showContents(['login-content']);
+            } else {
+                onOtherResponse(document.getElementById('register-form'), this);
+            }
+        }
+
+        function onOtherResponse(targetEl, xhr) {
+            if (xhr.status === NOT_FOUND) {
+                newError(targetEl, 'Not found');
+                console.error(xhr);
+            } else {
+                const json = JSON.parse(xhr.responseText);
+                if (xhr.status === INTERNAL_SERVER_ERROR) {
+                    newError(targetEl, `Server error: ${json.message}`);
+                } else if (xhr.status === UNAUTHORIZED || xhr.status === BAD_REQUEST) {
+                    newError(targetEl, json.message);
+                } else {
+                    newError(targetEl, `Unknown error: ${json.message}`);
+                }
+            }
+        }
+
+        function newError(targetEl, message) {
+            newMessage(targetEl, 'error', message);
+        }
+
+        function newMessage(targetEl, cssClass, message) {
+            clearMessages();
+
+            const pEl = document.createElement('p');
+            pEl.classList.add('message');
+            pEl.classList.add(cssClass);
+            pEl.textContent = message;
+
+            targetEl.appendChild(pEl);
+        }
+
+        function clearMessages() {
+            const messageEls = document.getElementsByClassName('message');
+            for (let i = 0; i < messageEls.length; i++) {
+                const messageEl = messageEls[i];
+                messageEl.remove();
+            }
+        }
+
+        function onNetworkError(response) {
+            document.body.remove();
+            const bodyEl = document.createElement('body');
+            document.appendChild(bodyEl);
+            newError(bodyEl, 'Network error, please try reloading the page');
+        }
 
 
-    function setAuthorization(user) {
-        return localStorage.setItem('user', JSON.stringify(user));
-    }
+        function onLoginResponse() {
+            if (this.status === OK) {
+                const user = JSON.parse(this.responseText);
+                setAuthorization(user);
+                showContents('welcome-content')
+                // onProfileLoad(user);
+            } else {
+                onOtherResponse(document.getElementById('login-form'), this);
+            }
+        }
 
-    function loadGames() {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'protected/games');
-        xhr.onload = function () {
-            if(this.status == OK){
-                let games = JSON.parse(this.responseText);
-                let output = '';
-                for(var i in games){
-                    output += '<div id="games-content" class="content games">' +
-                        '<img src="'+games[i].imageUrl+'" width="150" height="150">' +
+        function onLoginButtonClicked() {
+            const loginFormEl = document.forms['login-form'];
+
+            const emailInputEl = loginFormEl.querySelector('input[name="email"]');
+            const passwordInputEl = loginFormEl.querySelector('input[name="password"]');
+
+            const email = emailInputEl.value;
+            const password = passwordInputEl.value;
+
+            const params = new URLSearchParams();
+            params.append('email', email);
+            params.append('password', password);
+
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', onLoginResponse);
+            xhr.addEventListener('error', onNetworkError);
+            xhr.open('POST', 'login');
+
+            xhr.send(params);
+        }
+
+
+        function setAuthorization(user) {
+            return localStorage.setItem('user', JSON.stringify(user));
+        }
+
+        function loadGames() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'games');
+            xhr.onload = function () {
+                if (this.status == OK) {
+                    let games = JSON.parse(this.responseText);
+                    let output = '';
+                    for (var i in games) {
+                        output += '<div id="games-content" class="content games">' +
+                            '<img src="' + games[i].imageUrl + '" width="150" height="150">' +
+                            '<ul>' +
+                            '<li>Name: ' + games[i].name + '</li>' +
+                            '<li>Platform: ' + games[i].platform + '</li>' +
+                            '<li>Price: ' + games[i].price + '</li>' +
+                            '<li><button id="buy-game" content="' + games[i].id + '">Buy game</button> </li>' +
+                            '</ul>' +
+                            '</div>';
+                    }
+                    document.getElementById('games-content').innerHTML = output;
+                }
+            }
+            showContents(['welcome-content', 'games-content'])
+            xhr.send();
+        }
+
+        function backToWelcomeScreen() {
+            onLoginButtonClicked();
+        }
+
+        function onProfileButtonClicked() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'protected/personalInfos');
+            xhr.onload = function () {
+                if (this.status == OK) {
+                    let personalInfos = JSON.parse(this.responseText);
+                    let output = '<div id="sub-profile-content" class="content profile">' +
                         '<ul>' +
-                        '<li>Name: '+games[i].name+'</li>' +
-                        '<li>Platform: '+games[i].platform+'</li>' +
-                        '<li>Price: '+games[i].price+'</li>' +
-                        '<li><button id="buy-game" content="'+games[i].id+'">Buy game</button> </li>'+
+                        '<li>Name: ' + personalInfos.name + '</li>' +
+                        '<li>Address: ' + personalInfos.address + '</li>' +
+                        '<li>Phone number: ' + personalInfos.phoneNumber + '</li>' +
                         '</ul>' +
                         '</div>';
+                    document.getElementById('profile-content').innerHTML = output;
                 }
-                document.getElementById('games-content').innerHTML = output;
+            }
+            showContents(['welcome-content', 'profile-content', 'change-profile-infos-content']);
+            xhr.send();
+        }
+
+        function onChangeProfileInfosButtonClicked() {
+            const changeProfilInfosEl = document.forms['change-profile-infos-form'];
+
+            const nameInputEl = changeProfilInfosEl.querySelector('input[name="name"]');
+            const addressInputEl = changeProfilInfosEl.querySelector('input[name="address"]');
+            const phoneNumberInputEl = changeProfilInfosEl.querySelector('input[name="phoneNumber"]');
+
+
+            const name = nameInputEl.value;
+            const address = addressInputEl.value;
+            const phoneNumber = phoneNumberInputEl.value;
+
+            const params = new URLSearchParams();
+            params.append('name', name);
+            params.append('address', address);
+            params.append('phoneNumber', phoneNumber);
+
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', onChangeProfileInfosRespond);
+            xhr.addEventListener('error', onNetworkError);
+            xhr.open('POST', 'protected/personalInfos');
+            xhr.send(params);
+        }
+
+        function onChangeProfileInfosRespond() {
+            if (this.status === OK) {
+                const personalInfos = JSON.parse(this.responseText);
+                alert('Profile infos updated !')
+                showContents(['welcome-content']);
+            } //else {
+            // onOtherResponse(document.getElementById('register-form'), this);
+            //}
+        }
+
+        function onLogoutButtonClicked() {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', onLogoutResponse);
+            xhr.addEventListener('error', onNetworkError);
+            xhr.open('GET', 'logout');
+            xhr.send();
+        }
+
+        function onLogoutResponse() {
+            if (this.status === OK) {
+                const response = JSON.parse(this.responseText);
+                alert(response.message);
+                onLoad();
+            } else {
+                const contentEls = document.getElementsByClassName('content');
+                for (let i = 0; i < contentEls.length; i++) {
+                    const contentEl = contentEls[i];
+                    if (contentEl.style.display === 'block') {
+                        onOtherResponse(contentEl);
+                    }
+                }
             }
         }
-        showContents(['welcome-content', 'games-content'])
-        xhr.send();
-    }
-
-    function backToWelcomeScreen() {
-        onLoginButtonClicked();
-    }
-
-    function onProfileButtonClicked() {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'protected/personalInfos');
-        xhr.onload = function () {
-            if(this.status == OK){
-                let personalInfos = JSON.parse(this.responseText);
-                let output = '<div id="profile-content" class="content profile">' +
-                    '<ul>' +
-                    '<li>Name: '+personalInfos.name+'</li>' +
-                    '<li>Address: '+personalInfos.address+'</li>' +
-                    '<li>Phone number: '+personalInfos.phoneNumber+'</li>' +
-                    '</ul>' +
-                    '</div>';
-                document.getElementById('profile-content').innerHTML = output;
-            }
-        }
-        showContents(['welcome-content', 'profile-content']);
-        xhr.send();
-    }
-
-
 </script>
 
 </body>

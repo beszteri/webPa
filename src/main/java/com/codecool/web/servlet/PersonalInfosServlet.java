@@ -6,6 +6,7 @@ import com.codecool.web.dao.database.DatabasePersonalInfosDao;
 import com.codecool.web.dao.database.DatabaseUserDao;
 import com.codecool.web.model.PersonalInfos;
 import com.codecool.web.model.User;
+import com.codecool.web.service.PasswordService;
 import com.codecool.web.service.PersonalInfosService;
 import com.codecool.web.service.UserService;
 import com.codecool.web.service.simple.SimplePersonalInfosService;
@@ -17,6 +18,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -35,6 +38,8 @@ public class PersonalInfosServlet extends AbstractServlet {
             User user = (User) request.getSession().getAttribute("user");
             int userId = user.getId();
 
+            System.out.println(userId);
+
             if(!personalInfosDao.findIfPersonalInfosExist(userId)){
                 personalInfosDao.addPersonalInfos("unknown", "unkown", "unkown", userId);
             }
@@ -46,6 +51,35 @@ public class PersonalInfosServlet extends AbstractServlet {
         }
     }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try (Connection connection = getConnection(req.getServletContext())) {
+            PersonalInfosDao personalInfosDao = new DatabasePersonalInfosDao(connection);
+            PersonalInfosService personalInfosService = new SimplePersonalInfosService(personalInfosDao);
+            PasswordService passwordService = new PasswordService();
 
+            User user = (User) req.getSession().getAttribute("user");
+            String name = req.getParameter("name");
+            String address = req.getParameter("address");
+            String phoneNumber = req.getParameter("phoneNumber");
+
+            if(address != null) {
+                personalInfosService.updateAddressById(user.getId(), address);
+            }
+            if(name != null) {
+                personalInfosService.updateNameById(user.getId(), name);
+            }
+            if(phoneNumber != null) {
+                personalInfosService.updatePhoneNumberById(user.getId(), phoneNumber);
+
+            }
+            System.out.println(user.getId() + name + address + phoneNumber);
+            req.getSession().setAttribute("user", user);
+            sendMessage(resp, HttpServletResponse.SC_OK, "Your data has been updated.");
+        } catch (SQLException exc) {
+            handleSqlError(resp, exc);
+        }
+
+    }
 
 }

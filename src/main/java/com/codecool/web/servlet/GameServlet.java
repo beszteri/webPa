@@ -16,7 +16,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/protected/games")
+@WebServlet("/games")
 public class GameServlet extends AbstractServlet{
 
     private final ObjectMapper om = new ObjectMapper();
