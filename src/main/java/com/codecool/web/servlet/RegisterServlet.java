@@ -2,10 +2,13 @@ package com.codecool.web.servlet;
 
 import com.codecool.web.dao.UserDao;
 import com.codecool.web.dao.database.DatabaseUserDao;
+import com.codecool.web.model.PersonalInfos;
 import com.codecool.web.model.Role;
 import com.codecool.web.model.User;
 import com.codecool.web.service.PasswordService;
+import com.codecool.web.service.PersonalInfosService;
 import com.codecool.web.service.UserService;
+import com.codecool.web.service.simple.SimplePersonalInfosService;
 import com.codecool.web.service.simple.SimpleUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,6 +32,8 @@ public class RegisterServlet extends AbstractServlet {
             UserDao userDao = new DatabaseUserDao(connection);
             UserService userService = new SimpleUserService(userDao);
             PasswordService passwordService = new PasswordService();
+
+
 
             String email = req.getParameter("email");
             String password = req.getParameter("password");

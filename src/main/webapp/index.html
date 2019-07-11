@@ -34,6 +34,13 @@
 <div id="welcome-content" class="hidden content">
     <h1>Welcome</h1>
     <button id="games-button">Load games</button>
+    <button id="profile-button">My profile</button>
+    <button id="mainpage-button">Main Page</button>
+</div>
+
+<div id="games-content" class="hidden content"></div>
+
+<div id="profile-content" class="hidden content">
 </div>
 
 
@@ -50,6 +57,7 @@
     let welcomeContentDivEl;
     let registerContentDivEl;
     let guestContentDivEl;
+    let profileContentDivEl;
 
 
     document.addEventListener('DOMContentLoaded', onLoad);
@@ -58,13 +66,21 @@
         loginContentDivEl = document.getElementById('login-content');
         welcomeContentDivEl = document.getElementById('welcome-content');
         registerContentDivEl = document.getElementById('register-content');
+        profileContentDivEl = document.getElementById('profile-content');
+
 
         const gamesButtonEl = document.getElementById('games-button');
         gamesButtonEl.addEventListener('click', loadGames);
 
+        const backButtonEl = document.getElementById('mainpage-button');
+        backButtonEl.addEventListener('click', backToWelcomeScreen);
+
         const registerButtonEl = document.getElementById('register-button');
         registerButtonEl.addEventListener('click', onRegisterButtonClicked);
         getCurrentUser();
+
+        const profileButtonEl = document.getElementById('profile-button');
+        profileButtonEl.addEventListener('click', onProfileButtonClicked);
 
         const loginButtonEl = document.getElementById('login-button');
         loginButtonEl.addEventListener('click', onLoginButtonClicked);
@@ -220,20 +236,46 @@
         xhr.onload = function () {
             if(this.status == OK){
                 let games = JSON.parse(this.responseText);
-                let output = '<button id="backToMain-button">Back</button>';
+                let output = '';
                 for(var i in games){
-                    output += '<div class="games">' +
+                    output += '<div id="games-content" class="content games">' +
                         '<img src="'+games[i].imageUrl+'" width="150" height="150">' +
                         '<ul>' +
                         '<li>Name: '+games[i].name+'</li>' +
                         '<li>Platform: '+games[i].platform+'</li>' +
                         '<li>Price: '+games[i].price+'</li>' +
+                        '<li><button id="buy-game" content="'+games[i].id+'">Buy game</button> </li>'+
                         '</ul>' +
                         '</div>';
                 }
-                document.getElementById('welcome-content').innerHTML = output;
+                document.getElementById('games-content').innerHTML = output;
             }
         }
+        showContents(['welcome-content', 'games-content'])
+        xhr.send();
+    }
+
+    function backToWelcomeScreen() {
+        onLoginButtonClicked();
+    }
+
+    function onProfileButtonClicked() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'protected/personalInfos');
+        xhr.onload = function () {
+            if(this.status == OK){
+                let personalInfos = JSON.parse(this.responseText);
+                let output = '<div id="profile-content" class="content profile">' +
+                    '<ul>' +
+                    '<li>Name: '+personalInfos.name+'</li>' +
+                    '<li>Address: '+personalInfos.address+'</li>' +
+                    '<li>Phone number: '+personalInfos.phoneNumber+'</li>' +
+                    '</ul>' +
+                    '</div>';
+                document.getElementById('profile-content').innerHTML = output;
+            }
+        }
+        showContents(['welcome-content', 'profile-content']);
         xhr.send();
     }
 
