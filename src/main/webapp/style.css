@@ -1,3 +1,18 @@
+body{
+    background-image: url("http://cdn.miscellaneoushi.com/1920x1080/20121019/xbox%20black%20background%20controller%20xbox%20controller%201920x1080%20wallpaper_www.miscellaneoushi.com_8.jpg");
+    background-size:cover;
+    background-repeat:no-repeat;
+}
+
 .hidden {
     display: none;
+}
+.games {
+    display: flex;
+    background: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.games ul{
+    list-style: none;
 }

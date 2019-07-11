@@ -33,7 +33,10 @@
 
 <div id="welcome-content" class="hidden content">
     <h1>Welcome</h1>
+    <button id="games-button">Load games</button>
 </div>
+
+
 
 <script>
 
@@ -48,12 +51,16 @@
     let registerContentDivEl;
     let guestContentDivEl;
 
+
     document.addEventListener('DOMContentLoaded', onLoad);
 
     function onLoad() {
         loginContentDivEl = document.getElementById('login-content');
         welcomeContentDivEl = document.getElementById('welcome-content');
         registerContentDivEl = document.getElementById('register-content');
+
+        const gamesButtonEl = document.getElementById('games-button');
+        gamesButtonEl.addEventListener('click', loadGames);
 
         const registerButtonEl = document.getElementById('register-button');
         registerButtonEl.addEventListener('click', onRegisterButtonClicked);
@@ -205,6 +212,29 @@
 
     function setAuthorization(user) {
         return localStorage.setItem('user', JSON.stringify(user));
+    }
+
+    function loadGames() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'protected/games');
+        xhr.onload = function () {
+            if(this.status == OK){
+                let games = JSON.parse(this.responseText);
+                let output = '<button id="backToMain-button">Back</button>';
+                for(var i in games){
+                    output += '<div class="games">' +
+                        '<img src="'+games[i].imageUrl+'" width="150" height="150">' +
+                        '<ul>' +
+                        '<li>Name: '+games[i].name+'</li>' +
+                        '<li>Platform: '+games[i].platform+'</li>' +
+                        '<li>Price: '+games[i].price+'</li>' +
+                        '</ul>' +
+                        '</div>';
+                }
+                document.getElementById('welcome-content').innerHTML = output;
+            }
+        }
+        xhr.send();
     }
 
 
