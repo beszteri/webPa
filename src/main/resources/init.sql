@@ -48,9 +48,17 @@ create or replace function shop_balance() returns trigger as '
             balance integer;
             price integer;
                 begin
-                    select balance into balance from users join
-        end;
-    end;'
+                    select balance into balance from users join usersGame on users.id = usersGame.userId where users.id = new.id;
+                    select price into price from usersGame join games on usersGame.userId = games.id where games.id = new.id;
+                    if  balance < price then
+                        raise exception ''Balance is not enough'';
+                    else
+                        update users set balance=balance-price where id = new.id;
+                    end if;
+            end;
+        return new;
+    end;
+' language plpgsql;
 
 insert into games (name, platform, imageUrl, price) VALUES
 ('Spider-Man', 'PS4', 'https://p1.akcdn.net/full/422035987.sony-marvel-spider-man-ps4.jpg', 50),
