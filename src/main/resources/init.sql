@@ -4,6 +4,7 @@
 DROP TABLE IF EXISTS users CASCADE ;
 DROP TABLE IF EXISTS userInfos CASCADE ;
 DROP TABLE IF EXISTS games CASCADE ;
+drop table if exists usersGame cascade ;
 
 
 CREATE TABLE users (
@@ -33,15 +34,23 @@ CREATE TABLE games (
     price integer not null
 );
 
---INSERT INTO users (email, password, balance, role) VALUES
---('user1@user1.hu', 'user1', 0, 'REGISTERED'),
---('user2@user2.hu', 'user2', 0, 'REGISTERED'),
---('user2@user3.hu', 'user3', 0, 'ADMIN');
+create table usersGame(
+  userId integer,
+  gameId integer,
+  foreign key (userId) references users(id),
+  foreign key (gameId) references games(id),
+  unique (userId, gameId)
+);
 
---insert into userInfos (address, name, phoneNumber, userId) VALUES
---('Budapest', 'name name', '0687254537732', 1),
---('Nyíregyháza', 'nam2 gyula', '123213124442', 2),
---('Siófok', 'név név', '2138765853243', 3);
+create or replace function shop_balance() returns trigger as '
+    begin
+        declare
+            balance integer;
+            price integer;
+                begin
+                    select balance into balance from users join
+        end;
+    end;'
 
 insert into games (name, platform, imageUrl, price) VALUES
 ('Spider-Man', 'PS4', 'https://p1.akcdn.net/full/422035987.sony-marvel-spider-man-ps4.jpg', 50),
