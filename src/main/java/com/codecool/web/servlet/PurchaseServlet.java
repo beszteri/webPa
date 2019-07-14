@@ -42,9 +42,7 @@ public class PurchaseServlet extends AbstractServlet{
 
             User user = (User) req.getSession().getAttribute("user");
             int userId = user.getId();
-            System.out.println(userId + "user id");
             int gameId = Integer.parseInt(req.getParameter("gameBuyId"));
-            System.out.println(gameId);
             gameService.buyGame(userId, gameId);
 
 

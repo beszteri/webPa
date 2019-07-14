@@ -20,17 +20,14 @@ public final class DatabaseUserDao extends AbstractDao implements UserDao {
         String password = resultset.getString("password");
         int balance = resultset.getInt("balance");
         Role role = Role.valueOf(resultset.getString("role"));
-        System.out.println(email + password + balance + role);
         return new User(id, email, password, balance, role);
     }
 
     @Override
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM users WHERE email=?";
-        System.out.println("előtt");
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
-            System.out.println("után");
             try (ResultSet resultSet = statement.executeQuery()) {
                 if(resultSet.next()) {
                     return fetchUser(resultSet);

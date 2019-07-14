@@ -38,7 +38,6 @@ public class PersonalInfosServlet extends AbstractServlet {
             User user = (User) request.getSession().getAttribute("user");
             int userId = user.getId();
 
-            System.out.println(userId);
 
             if(!personalInfosDao.findIfPersonalInfosExist(userId)){
                 personalInfosDao.addPersonalInfos("unknown", "unkown", "unkown", userId);
