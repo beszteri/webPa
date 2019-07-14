@@ -11,4 +11,8 @@ public interface GameDao {
 
     void buyGame(int userId, int gameId) throws SQLException;
 
+    List<Game> findAllPurchasedGameByUserId(int userId) throws SQLException;
+
+    Game findById(int id) throws SQLException;
+
 }

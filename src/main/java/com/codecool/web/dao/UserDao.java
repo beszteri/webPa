@@ -20,4 +20,5 @@ public interface UserDao {
 
     void addToBalanceById(int id, int deposit) throws SQLException;
 
+
 }

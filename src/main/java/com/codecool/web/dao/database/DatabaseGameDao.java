@@ -20,13 +20,13 @@ public class DatabaseGameDao extends AbstractDao implements GameDao {
              ResultSet resultSet = statement.executeQuery(sql)) {
             List<Game> games = new ArrayList<>();
             while (resultSet.next()) {
-                games.add(fetchPlane(resultSet));
+                games.add(fetchGame(resultSet));
             }
             return games;
         }
     }
 
-    private Game fetchPlane(ResultSet resultSet) throws SQLException {
+    private Game fetchGame(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String name = resultSet.getString("name");
         String platform = resultSet.getString("platform");
@@ -51,5 +51,35 @@ public class DatabaseGameDao extends AbstractDao implements GameDao {
         } finally {
             connection.setAutoCommit(autoCommit);
         }
+    }
+
+    @Override
+    public Game findById(int id) throws SQLException {
+        String sql = "SELECT * FROM games WHERE id=?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if(resultSet.next()) {
+                    return fetchGame(resultSet);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<Game> findAllPurchasedGameByUserId(int userId) throws SQLException {
+        String sql = "SELECT * FROM usersGame WHERE userId=?";
+        List<Game> purchasedGames = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    purchasedGames.add(findById(resultSet.getInt("gameId")));
+                    System.out.println("megvett:  " + resultSet.getInt("gameId"));
+                }
+            }
+        }
+        return purchasedGames;
     }
 }

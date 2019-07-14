@@ -36,10 +36,11 @@
 </div>
 
 <div id="welcome-content" class="hidden content">
-    <h1>Welcome</h1>
+    <h1>GameShop</h1>
+    <button id="mainpage-button" >Main Page</button>
     <button id="games-button" >Load games</button>
     <button id="profile-button" >My profile</button>
-    <button id="mainpage-button" >Main Page</button>
+    <button id="my-purchases-button">My purchases</button>
     <button id="logout-button">Logout</button>
 </div>
 
@@ -70,6 +71,8 @@
     <button id="actual-balance-button">My actual balance</button>
 </div>
 
+<div id="my-purchases-content" class="hidden content">
+</div>
 
 
 <script>
@@ -96,6 +99,9 @@
         registerContentDivEl = document.getElementById('register-content');
         profileContentDivEl = document.getElementById('profile-content');
         gamesContentDivEl = document.getElementById('games-content');
+
+        const myPurchasesButtonEl = document.getElementById('my-purchases-button');
+        myPurchasesButtonEl.addEventListener('click', onMyPurchasesButtonClicked);
 
         const addToBalanceButtonEl = document.getElementById('add-to-balance-button');
         addToBalanceButtonEl.addEventListener('click', onAddToBalanceButtonClicked);
@@ -551,6 +557,29 @@
                 alert('Your actual balance is : ' + user.balance);
             }
         }
+        xhr.send();
+    }
+
+    function onMyPurchasesButtonClicked() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'protected/users');
+        xhr.onload = function () {
+            if (this.status === OK) {
+                let games = JSON.parse(this.responseText);
+                let output = '';
+                for (var i in games) {
+                    output += '<div id="my-purchases-content" class="content">' +
+                        '<ul>' +
+                        '<li><img src="' + games[i].imageUrl + '" width="150" height="150"></li>' +
+                        '<li>Name: ' + games[i].name + '</li>' +
+                        '<li>Platform: ' + games[i].platform + '</li>' +
+                        '</ul>' +
+                        '</div>';
+                }
+                document.getElementById('my-purchases-content').innerHTML = output;
+            }
+        }
+        showContents(['welcome-content', 'my-purchases-content']);
         xhr.send();
     }
 
