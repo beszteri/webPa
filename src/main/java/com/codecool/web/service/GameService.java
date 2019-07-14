@@ -9,4 +9,7 @@ public interface GameService {
 
     List<Game> findAll() throws SQLException;
 
+    void buyGame(int userId, int gameId) throws SQLException;
+
+
 }

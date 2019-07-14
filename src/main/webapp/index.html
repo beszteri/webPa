@@ -43,7 +43,7 @@
     <button id="logout-button">Logout</button>
 </div>
 
-<div id="games-content" class="hidden content"></div>
+<div id="games-content" class="hidden content games"></div>
 
 <div id="profile-content" class="hidden content">
     <button id="change-profile-button">Change profil infos</button>
@@ -61,6 +61,15 @@
     </form>
 </div>
 
+<div id="add-to-balance-content" class="hiddent content">
+    <form id="add-to-balance-form" onsubmit="return false;">
+        <br><br>
+        <input type="text" name="balance" placeholder="123456"><br>
+        <button id="add-to-balance-button">Add to balance</button>
+    </form>
+    <button id="actual-balance-button">My actual balance</button>
+</div>
+
 
 
 <script>
@@ -76,6 +85,8 @@
     let registerContentDivEl;
     let guestContentDivEl;
     let profileContentDivEl;
+    let gamesContentDivEl;
+
 
     document.addEventListener('DOMContentLoaded', onLoad);
 
@@ -84,6 +95,13 @@
         welcomeContentDivEl = document.getElementById('welcome-content');
         registerContentDivEl = document.getElementById('register-content');
         profileContentDivEl = document.getElementById('profile-content');
+        gamesContentDivEl = document.getElementById('games-content');
+
+        const addToBalanceButtonEl = document.getElementById('add-to-balance-button');
+        addToBalanceButtonEl.addEventListener('click', onAddToBalanceButtonClicked);
+
+        const myActualBalanceButtonEl = document.getElementById('actual-balance-button');
+        myActualBalanceButtonEl.addEventListener('click', onActualBalanceButtonClicked);
 
         const changeProfileButtonEl = document.getElementById('change-profile-infos-button');
         changeProfileButtonEl.addEventListener('click', onChangeProfileInfosButtonClicked);
@@ -96,7 +114,6 @@
 
         const registerButtonEl = document.getElementById('register-button');
         registerButtonEl.addEventListener('click', onRegisterButtonClicked);
-        getCurrentUser();
 
         const logoutButtonEl = document.getElementById('logout-button');
         logoutButtonEl.addEventListener('click', onLogoutButtonClicked);
@@ -113,33 +130,34 @@
         const backToLoginPageButtonEl = document.getElementById('back-to-login-page');
         backToLoginPageButtonEl.addEventListener('click', showLoginScreen);
 
-        /*getCurrentUser();
+
+        getCurrentUser();
         if (hasAuthorization()) {
             onProfileLoad(getCurrentUser());
         } else {
-            showContents(['login-content']);
-        }*/
+            showContents(['login-content', 'register-content']);
+        }
     }
 
-    /*function onProfileLoad(user) {
+    function onProfileLoad(user) {
         if (user.role === 'ADMIN') {
-
+            showContents(['login-content', 'register-content']);
         } else if (user.role === 'REGISTERED') {
-
+            showContents(['login-content', 'register-content']);
         } else if (user.role === 'UNREGISTERED') {
-
+            showContents(['login-content', 'register-content']);
         }
     }
 
         function hasAuthorization() {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('error', onNetworkError);
-            xhr.open('GET', 'protected/profileInfos');
+            xhr.open('GET', 'protected/profile');
             xhr.send();
             if (xhr.status === OK) {
                 return true;
             }
-        }*/
+        }
 
         function onGuestButtonClicked() {
             const xhr = new XMLHttpRequest();
@@ -162,7 +180,7 @@
                     document.getElementById('guest-loaded-content').innerHTML = output;
                 }
             }
-            showContents(['guest-loaded-content', 'guest-content'])
+            showContents(['guest-loaded-content', 'guest-content']);
             xhr.send();
         }
 
@@ -305,23 +323,84 @@
             xhr.onload = function () {
                 if (this.status == OK) {
                     let games = JSON.parse(this.responseText);
-                    let output = '';
-                    for (var i in games) {
-                        output += '<div id="games-content" class="content games">' +
-                            '<img src="' + games[i].imageUrl + '" width="150" height="150">' +
-                            '<ul>' +
-                            '<li>Name: ' + games[i].name + '</li>' +
-                            '<li>Platform: ' + games[i].platform + '</li>' +
-                            '<li>Price: ' + games[i].price + '</li>' +
-                            '<li><button id="buy-game" content="' + games[i].id + '">Buy game</button> </li>' +
-                            '</ul>' +
-                            '</div>';
+                    const tbodyEl = document.createElement('tbody');
+                    tbodyEl.setAttribute('class', 'buy-cells');
+
+
+                    for (let i = 0; i < games.length; i++) {
+                        const game = games[i];
+
+                        const imageTdEl = document.createElement('td');
+                        imageTdEl.classList.add('default-cell');
+                        imageTdEl.innerHTML = '<img src="' + game.imageUrl + '" width="150" height="150">';
+
+                        const nameTdEl = document.createElement('td');
+                        nameTdEl.classList.add('default-cell');
+                        nameTdEl.textContent = game.name;
+
+                        const platformTdEl = document.createElement('td');
+                        platformTdEl.classList.add('default-cell');
+                        platformTdEl.textContent = game.platform;
+
+                        const priceTdEl = document.createElement('td');
+                        priceTdEl.classList.add('default-cell');
+                        priceTdEl.textContent = game.price;
+
+                        const buttonBuyEl = document.createElement('button');
+                        buttonBuyEl.textContent = "Buy game";
+                        buttonBuyEl.setAttribute('id', 'buy-game' + game.id);
+
+                        buttonBuyEl.dataset.gameBuyId = game.id;
+                        buttonBuyEl.addEventListener('click', onBuyButtonClicked);
+
+                        buttonBuyEl.dataset.gamePrice = game.price;
+
+                        const buttonOneTdEl = document.createElement('td');
+                        buttonOneTdEl.appendChild(buttonBuyEl);
+                        buttonOneTdEl.setAttribute('id', 'buy-game-' + game.id);
+
+                        const trEl = document.createElement('tr');
+                        trEl.setAttribute('id', 'row-game-id-' + game.id);
+                        trEl.appendChild(imageTdEl);
+                        trEl.appendChild(nameTdEl);
+                        trEl.appendChild(platformTdEl);
+                        trEl.appendChild(priceTdEl);
+                        if (getCurrentUser().role === 'REGISTERED') {
+                            trEl.appendChild(buttonOneTdEl);
+                        }
+                        tbodyEl.appendChild(trEl);
+                        gamesContentDivEl.innerHTML = '';
+                        gamesContentDivEl.appendChild(tbodyEl);
                     }
-                    document.getElementById('games-content').innerHTML = output;
+
+
+                    //return tbodyEl;
+
+
+
+
+
+                    /*          if (this.status == OK) {
+                                  let games = JSON.parse(this.responseText);
+                                  let output = '';
+                                  for (var i in games) {
+                                      output += '<div id="games-content" class="content games">' +
+                                          '<img src="' + games[i].imageUrl + '" width="150" height="150">' +
+                                          '<ul>' +
+                                          '<li>Name: ' + games[i].name + '</li>' +
+                                          '<li>Platform: ' + games[i].platform + '</li>' +
+                                          '<li>Price: ' + games[i].price + '</li>' +
+                                          '<li><button id="buy-game" name="buy-game" content="gameId' + games[i].id + '">Buy game</button> </li>' +
+                                          '</ul>' +
+                                          '</div>';
+                                  }
+                                //  document.getElementById('games-content').innerHTML = output;
+                              } */
                 }
             }
-            showContents(['welcome-content', 'games-content'])
+            showContents(['welcome-content', 'games-content']);
             xhr.send();
+
         }
 
         function backToWelcomeScreen() {
@@ -332,7 +411,7 @@
             const xhr = new XMLHttpRequest();
             xhr.open('GET', 'protected/personalInfos');
             xhr.onload = function () {
-                if (this.status == OK) {
+                if (this.status === OK) {
                     let personalInfos = JSON.parse(this.responseText);
                     let output = '<div id="sub-profile-content" class="content profile">' +
                         '<ul>' +
@@ -344,7 +423,7 @@
                     document.getElementById('profile-content').innerHTML = output;
                 }
             }
-            showContents(['welcome-content', 'profile-content', 'change-profile-infos-content']);
+            showContents(['welcome-content', 'profile-content', 'change-profile-infos-content','add-to-balance-content']);
             xhr.send();
         }
 
@@ -375,7 +454,7 @@
         function onChangeProfileInfosRespond() {
             if (this.status === OK) {
                 const personalInfos = JSON.parse(this.responseText);
-                alert('Profile infos updated !')
+                alert('Profile infos updated !');
                 showContents(['welcome-content']);
             } //else {
             // onOtherResponse(document.getElementById('register-form'), this);
@@ -405,6 +484,76 @@
                 }
             }
         }
+
+
+    function onBuyButtonClicked() {
+        const gameBuyId = this.dataset.gameBuyId;
+
+        const params = new URLSearchParams();
+        params.append('gameBuyId', gameBuyId);
+
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', onGameBuyResponse);
+        xhr.addEventListener('error', onNetworkError);
+        xhr.open('POST', 'protected/purchases');
+
+        xhr.send(params);
+    }
+
+    function onGameBuyResponse() {
+        if (this.status === OK) {
+            const message = JSON.parse(this.responseText);
+            alert(message.message);
+            showContents(['welcome-content', 'games-content']);
+        }else if (this.status === INTERNAL_SERVER_ERROR){
+            const json = JSON.parse(this.responseText);{
+                alert(`Already in purchase list ! \nServer error: ${json.message}`);
+            }
+        }
+        else {
+        onOtherResponse(gamesContentDivEl, this);
+        }
+    }
+
+    function onAddToBalanceButtonClicked() {
+        const addToBalanceFormEl = document.forms['add-to-balance-form'];
+
+        const balanceInputEl = addToBalanceFormEl.querySelector('input[name="balance"]');
+
+        const balance = balanceInputEl.value;
+
+        const params = new URLSearchParams();
+        params.append('balance', balance);
+
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', onAddToBalanceRespond);
+        xhr.addEventListener('error', onNetworkError);
+        xhr.open('POST', 'protected/users');
+        xhr.send(params);
+    }
+
+    function onAddToBalanceRespond() {
+        if (this.status === OK) {
+            const balance = JSON.parse(this.responseText);
+            alert('Added to balance !')
+            showContents(['welcome-content']);
+        } else {
+         onOtherResponse(document.getElementById('register-form'), this);
+        }
+    }
+
+    function onActualBalanceButtonClicked() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'protected/profile');
+        xhr.onload = function () {
+            if (this.status === OK) {
+                let user = JSON.parse(this.responseText);
+                alert('Your actual balance is : ' + user.balance);
+            }
+        }
+        xhr.send();
+    }
+
 </script>
 
 </body>

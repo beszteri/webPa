@@ -3,10 +3,7 @@ package com.codecool.web.dao.database;
 import com.codecool.web.dao.GameDao;
 import com.codecool.web.model.Game;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +33,23 @@ public class DatabaseGameDao extends AbstractDao implements GameDao {
         String imageUrl = resultSet.getString("imageUrl");
         int price = resultSet.getInt("price");
         return new Game(id,name, platform, imageUrl, price);
+    }
+
+    @Override
+    public void buyGame(int userId, int gameId) throws SQLException {
+        boolean autoCommit = connection.getAutoCommit();
+        connection.setAutoCommit(false);
+        String sql = "INSERT INTO usersGame(userId, gameId) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setInt(1, userId);
+            statement.setInt(2, gameId);
+            executeInsert(statement);
+            connection.commit();
+        } catch (SQLException ex) {
+            connection.rollback();
+            throw ex;
+        } finally {
+            connection.setAutoCommit(autoCommit);
+        }
     }
 }

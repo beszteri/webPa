@@ -19,4 +19,9 @@ public final class SimpleGameService implements GameService {
     public List<Game> findAll() throws SQLException {
         return gameDao.findAll();
     }
+
+    @Override
+    public void buyGame(int userId, int gameId) throws SQLException {
+        gameDao.buyGame(userId, gameId);
+    }
 }

@@ -40,7 +40,7 @@ public class RegisterServlet extends AbstractServlet {
             Role role = Role.REGISTERED;
 
             if (!userService.findIfUserExists(email)) {
-                User user = userService.addUser(email, passwordService.getHashedPassword(password), 0, role);
+                User user = userService.addUser(email, passwordService.getHashedPassword(password), 1, role);
 
                 req.setAttribute("user", user);
                 sendMessage(resp, HttpServletResponse.SC_OK, user);

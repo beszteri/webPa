@@ -22,20 +22,6 @@ public final class UsersServlet extends AbstractServlet {
     private final ObjectMapper om = new ObjectMapper();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try (Connection connection = getConnection(request.getServletContext())) {
-            UserDao userDao = new DatabaseUserDao(connection);
-            UserService userService = new SimpleUserService(userDao);
-
-            List<User> users = userService.findAll();
-
-            sendMessage(response, HttpServletResponse.SC_OK, users);
-        } catch (SQLException exc) {
-            handleSqlError(response, exc);
-        }
-    }
-
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try (Connection connection = getConnection(request.getServletContext())) {
             UserDao userDao = new DatabaseUserDao(connection);
@@ -43,11 +29,11 @@ public final class UsersServlet extends AbstractServlet {
 
             User user = (User) request.getSession().getAttribute("user");
 
-            int userDeposit = Integer.parseInt(request.getParameter("user-deposit"));
+            int userDeposit = Integer.parseInt(request.getParameter("balance"));
 
             userService.addToBalanceById(user.getId(), userDeposit);
 
-            sendMessage(response, HttpServletResponse.SC_OK, "Deposit successfully completed");
+            sendMessage(response, HttpServletResponse.SC_OK, "Added to balance");
         } catch (SQLException exc) {
             handleSqlError(response, exc);
         }

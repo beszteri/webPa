@@ -8,7 +8,7 @@ drop table if exists usersGame cascade ;
 
 
 CREATE TABLE users (
-                       id SERIAL PRIMARY KEY,
+                       id SERIAL unique PRIMARY KEY,
                        email TEXT UNIQUE NOT NULL,
                        password TEXT NOT NULL,
                        balance integer not null,
@@ -27,7 +27,7 @@ CREATE TABLE userInfos (
 );
 
 CREATE TABLE games (
-    id serial primary key ,
+    id serial unique primary key ,
     name text not null ,
     platform text not null , --enumra
     imageUrl text not null ,
@@ -45,20 +45,24 @@ create table usersGame(
 create or replace function shop_balance() returns trigger as '
     begin
         declare
-            balance integer;
-            price integer;
+            varBalance integer;
+            varPrice integer;
                 begin
-                    select balance into balance from users join usersGame on users.id = usersGame.userId where users.id = new.id;
-                    select price into price from usersGame join games on usersGame.userId = games.id where games.id = new.id;
-                    if  balance < price then
+                    select users.balance into varBalance from users join usersGame on users.id = usersGame.userId where users.id = new.userId;
+                    select games.price into varPrice from usersGame join games on usersGame.gameId = usersGame.gameId where games.id = new.gameId;
+                    if  varBalance < varPrice then
                         raise exception ''Balance is not enough'';
                     else
-                        update users set balance=balance-price where id = new.id;
+                        update users set balance=balance-varPrice where users.id = new.userId;
                     end if;
             end;
         return new;
     end;
 ' language plpgsql;
+
+create trigger shop_balance
+    after insert on usersGame
+    for each row execute procedure shop_balance();
 
 insert into games (name, platform, imageUrl, price) VALUES
 ('Spider-Man', 'PS4', 'https://p1.akcdn.net/full/422035987.sony-marvel-spider-man-ps4.jpg', 50),

@@ -5,17 +5,12 @@ body{
     color: darkgrey;
 }
 
+
 .hidden {
     display: none;
 }
-.games {
-    display: flex;
-    background: #f4f4f4;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-.games ul{
-    list-style: none;
-    color: black;
-    font-size: large;
+
+
+
+.buy-cells{
 }
