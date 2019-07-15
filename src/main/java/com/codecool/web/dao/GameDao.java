@@ -15,4 +15,6 @@ public interface GameDao {
 
     Game findById(int id) throws SQLException;
 
+    void saveGame(String name, String platform, String imageUrl, int price) throws SQLException;
+
 }

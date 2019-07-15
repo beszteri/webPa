@@ -1,6 +1,6 @@
 function loadGames() {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'games');
+    xhr.open('GET', 'protected/games');
     xhr.onload = function () {
         if (this.status == OK) {
             let games = JSON.parse(this.responseText);

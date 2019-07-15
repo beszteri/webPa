@@ -10,6 +10,7 @@ let registerContentDivEl;
 let guestContentDivEl;
 let profileContentDivEl;
 let gamesContentDivEl;
+let adminContentDivEl;
 
 
 
@@ -20,6 +21,10 @@ function onLoad() {
     registerContentDivEl = document.getElementById('register-content');
     profileContentDivEl = document.getElementById('profile-content');
     gamesContentDivEl = document.getElementById('games-content');
+    adminContentDivEl = document.getElementById('admin-content');
+
+    const saveGameButtonEl = document.getElementById('admin-button');
+    saveGameButtonEl.addEventListener('click', onSaveGameButtonClicked);
 
     const myPurchasesButtonEl = document.getElementById('my-purchases-button');
     myPurchasesButtonEl.addEventListener('click', onMyPurchasesButtonClicked);

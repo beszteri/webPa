@@ -24,4 +24,9 @@ public final class SimpleGameService implements GameService {
     public void buyGame(int userId, int gameId) throws SQLException {
         gameDao.buyGame(userId, gameId);
     }
+
+    @Override
+    public void saveGame(String name, String platform, String imageUrl, int price) throws SQLException {
+        gameDao.saveGame(name, platform, imageUrl, price);
+    }
 }

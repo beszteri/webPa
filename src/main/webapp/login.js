@@ -77,7 +77,7 @@ function onLoginResponse() {
         const user = JSON.parse(this.responseText);
         setAuthorization(user);
         showContents('welcome-content')
-        // onProfileLoad(user);
+        onProfileLoad(user);
     } else {
         onOtherResponse(document.getElementById('login-form'), this);
     }
@@ -100,7 +100,6 @@ function onLoginButtonClicked() {
     xhr.addEventListener('load', onLoginResponse);
     xhr.addEventListener('error', onNetworkError);
     xhr.open('POST', 'login');
-
     xhr.send(params);
 }
 

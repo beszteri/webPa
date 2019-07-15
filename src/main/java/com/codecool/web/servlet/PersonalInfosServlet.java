@@ -37,12 +37,12 @@ public class PersonalInfosServlet extends AbstractServlet {
 
             User user = (User) request.getSession().getAttribute("user");
             int userId = user.getId();
-
-
+            System.out.println(userId);
             if(!personalInfosDao.findIfPersonalInfosExist(userId)){
                 personalInfosDao.addPersonalInfos("unknown", "unkown", "unkown", userId);
             }
             PersonalInfos personalInfos = personalInfosService.findByUserId(userId);
+            System.out.println(personalInfos.getAddress() + "cim");
 
             sendMessage(response, HttpServletResponse.SC_OK, personalInfos);
         } catch (SQLException exc) {
@@ -72,7 +72,6 @@ public class PersonalInfosServlet extends AbstractServlet {
                 personalInfosService.updatePhoneNumberById(user.getId(), phoneNumber);
 
             }
-            System.out.println(user.getId() + name + address + phoneNumber);
             req.getSession().setAttribute("user", user);
             sendMessage(resp, HttpServletResponse.SC_OK, "Your data has been updated.");
         } catch (SQLException exc) {

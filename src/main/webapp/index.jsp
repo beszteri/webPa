@@ -17,6 +17,7 @@
     <c:url value="/guest.js" var="guestScriptUrl"/>
     <c:url value="/balance.js" var="balanceScriptUrl"/>
     <c:url value="/login.js" var="loginScriptUrl"/>
+    <c:url value="/admin.js" var="adminScriptUrl"/>
     <link rel="stylesheet" type="text/css" href="${styleUrl}">
     <script src="${indexScriptUrl}"></script>
     <script src="${profileScriptUrl}"></script>
@@ -27,6 +28,7 @@
     <script src="${guestScriptUrl}"></script>
     <script src="${balanceScriptUrl}"></script>
     <script src="${loginScriptUrl}"></script>
+    <script src="${adminScriptUrl}"></script>
     <title>Document</title>
 </head>
 <body>
@@ -69,7 +71,6 @@
 <div id="games-content" class="hidden content games"></div>
 
 <div id="profile-content" class="hidden content">
-    <button id="change-profile-button">Change profil infos</button>
 </div>
 
 <div id="change-profile-infos-content" class="hidden content">
@@ -95,5 +96,21 @@
 
 <div id="my-purchases-content" class="hidden content">
 </div>
+
+<div id="admin-content" class="hidden content">
+    <form id="admin-form" onsubmit="return false;">
+        <br><br>
+        <h2>You logged in as an admin, if you want to add a game to the database, please
+        fill the fields below:</h2>
+        <br>
+        <input type="text" name="name" placeholder="new game name"><br>
+        <input type="text" name="platform" placeholder="new game platform"><br>
+        <input type="url" name="imageUrl" placeholder="new game image url"><br>
+        <input type="number" name="price" placeholder="new game price"><br>
+        <button id="admin-button">Save game</button>
+    </form>
+</div>
+
+
 </body>
 </html>

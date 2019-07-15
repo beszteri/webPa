@@ -1,8 +1,8 @@
 function onProfileLoad(user) {
     if (user.role === 'ADMIN') {
-        showContents(['login-content', 'register-content']);
+        showContents(['welcome-content', 'admin-content']);
     } else if (user.role === 'REGISTERED') {
-        showContents(['login-content', 'register-content']);
+        showContents('welcome-content');
     } else if (user.role === 'UNREGISTERED') {
         showContents(['login-content', 'register-content']);
     }
@@ -13,7 +13,7 @@ function onProfileButtonClicked() {
     xhr.onload = function () {
         if (this.status === OK) {
             let personalInfos = JSON.parse(this.responseText);
-            let output = '<div id="sub-profile-content" class="content profile">' +
+            let output = '<div id="profile-content" class="content profile">' +
                 '<ul>' +
                 '<li>Name: ' + personalInfos.name + '</li>' +
                 '<li>Address: ' + personalInfos.address + '</li>' +
@@ -59,4 +59,15 @@ function onChangeProfileInfosRespond() {
     } //else {
     // onOtherResponse(document.getElementById('register-form'), this);
     //}
+}
+
+function onProfileLoadResponse() {
+    if (this.status === OK) {
+        const user = JSON.parse(this.responseText);
+        setAuthorization(user);
+        showContents(['welcome-content', 'profile-content']);
+        onProfileLoad(user);
+    } //else {
+        //onOtherResponse(document.getElementById('login-form'), this);
+   // }
 }

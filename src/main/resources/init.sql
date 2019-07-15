@@ -64,6 +64,9 @@ create trigger shop_balance
     after insert on usersGame
     for each row execute procedure shop_balance();
 
+insert into users (email, password, balance, role) VALUES
+('a', '1000:409fe2cfb15529fcbcc703c6ec160803:b06f766b8e27629b174f389e378e7e8b81b108d05a48e54e73efd92ca0398266c9bf9aef05191aff03595804636159ce029795404791b4806069c2a554f2c650', 0, 'ADMIN');
+
 insert into games (name, platform, imageUrl, price) VALUES
 ('Spider-Man', 'PS4', 'https://p1.akcdn.net/full/422035987.sony-marvel-spider-man-ps4.jpg', 50),
 ('God of War', 'PS4', 'https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.eF4doJiTCFL4q0nOfuNQBAHaI_%26pid%3DApi&f=1', 50),

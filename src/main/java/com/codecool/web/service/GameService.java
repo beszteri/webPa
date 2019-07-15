@@ -11,5 +11,7 @@ public interface GameService {
 
     void buyGame(int userId, int gameId) throws SQLException;
 
+    void saveGame(String name, String platform, String imageUrl, int price) throws SQLException;
+
 
 }
