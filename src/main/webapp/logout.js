@@ -10,6 +10,7 @@ function onLogoutResponse() {
     if (this.status === OK) {
         const response = JSON.parse(this.responseText);
         alert(response.message);
+        setUnauthorized();
         onLoad();
     } else {
         const contentEls = document.getElementsByClassName('content');
@@ -23,4 +24,11 @@ function onLogoutResponse() {
 }
 function backToWelcomeScreen() {
     onLoginButtonClicked();
+}
+
+
+
+
+function setUnauthorized() {
+    return localStorage.removeItem('user');
 }

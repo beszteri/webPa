@@ -1,14 +1,7 @@
-function onProfileLoad(user) {
-    if (user.role === 'ADMIN') {
-        showContents(['welcome-content', 'admin-content']);
-    } else if (user.role === 'REGISTERED') {
-        showContents('welcome-content');
-    } else if (user.role === 'UNREGISTERED') {
-        showContents(['login-content', 'register-content']);
-    }
-}
 function onProfileButtonClicked() {
     const xhr = new XMLHttpRequest();
+    xhr.addEventListener('load', onProfileLoadResponse);
+    xhr.addEventListener('error', onNetworkError);
     xhr.open('GET', 'protected/personalInfos');
     xhr.onload = function () {
         if (this.status === OK) {
@@ -64,8 +57,8 @@ function onChangeProfileInfosRespond() {
 function onProfileLoadResponse() {
     if (this.status === OK) {
         const user = JSON.parse(this.responseText);
-        setAuthorization(user);
-        showContents(['welcome-content', 'profile-content']);
+       // setAuthorization(user);
+        //showContents(['welcome-content', 'profile-content']);
         onProfileLoad(user);
     } //else {
         //onOtherResponse(document.getElementById('login-form'), this);

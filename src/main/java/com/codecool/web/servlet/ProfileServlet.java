@@ -29,8 +29,9 @@ public final class ProfileServlet extends AbstractServlet {
             UserDao userDao = new DatabaseUserDao(connection);
             UserService userService = new SimpleUserService(userDao);
 
-            User user = (User) request.getSession().getAttribute("user");
-            int userId = user.getId();
+            //User user = (User) request.getSession().getAttribute("user");
+             int userId = Integer.parseInt(request.getParameter("userId"));
+           // int userId = user.getId();
 
             sendMessage(response, HttpServletResponse.SC_OK, userService.findById(userId));
         } catch (SQLException exc) {

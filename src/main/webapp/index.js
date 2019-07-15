@@ -62,7 +62,6 @@ function onLoad() {
     const backToLoginPageButtonEl = document.getElementById('back-to-login-page');
     backToLoginPageButtonEl.addEventListener('click', showLoginScreen);
 
-
     getCurrentUser();
     if (hasAuthorization()) {
         onProfileLoad(getCurrentUser());

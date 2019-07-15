@@ -39,7 +39,7 @@ public final class DatabasePersonalInfosDao extends AbstractDao implements Perso
 
     @Override
     public PersonalInfos findByUserId(int id) throws SQLException {
-        String sql = "SELECT * FROM userInfos WHERE id=?";
+        String sql = "SELECT * FROM userInfos WHERE userId=?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {

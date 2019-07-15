@@ -1,12 +1,12 @@
-function hasAuthorization() {
+/*function hasAuthorization() {
     const xhr = new XMLHttpRequest();
     xhr.addEventListener('error', onNetworkError);
-    xhr.open('GET', 'protected/profile');
+    xhr.open('GET', 'protected/profile');           -------nem localos
     xhr.send();
     if (xhr.status === OK) {
         return true;
     }
-}
+}*/
 function showContents(ids) {
     const contentEls = document.getElementsByClassName('content');
     for (let i = 0; i < contentEls.length; i++) {
@@ -22,9 +22,8 @@ function showLoginScreen() {
     showContents(['login-content', 'register-content']);
 }
 
-function getCurrentUser() {
-    return JSON.parse(localStorage.getItem('user'));
-}
+
+
 function onOtherResponse(targetEl, xhr) {
     if (xhr.status === NOT_FOUND) {
         newError(targetEl, 'Not found');
@@ -76,7 +75,7 @@ function onLoginResponse() {
     if (this.status === OK) {
         const user = JSON.parse(this.responseText);
         setAuthorization(user);
-        showContents('welcome-content')
+        showContents(['welcome-content']);
         onProfileLoad(user);
     } else {
         onOtherResponse(document.getElementById('login-form'), this);
@@ -106,4 +105,19 @@ function onLoginButtonClicked() {
 
 function setAuthorization(user) {
     return localStorage.setItem('user', JSON.stringify(user));
+}
+function getCurrentUser() { // vagy getCurrentUser
+    return JSON.parse(localStorage.getItem('user'));
+}
+function hasAuthorization() {
+    return localStorage.getItem('user') !== null;
+}
+function onProfileLoad(user) {
+    if (user.role === 'ADMIN') {
+        showContents(['welcome-content', 'admin-content']);
+    } else if (user.role === 'REGISTERED') {
+        showContents(['welcome-content']);
+    } else if (user.role === 'UNREGISTERED') {
+        showContents(['login-content', 'register-content']);
+    }
 }
