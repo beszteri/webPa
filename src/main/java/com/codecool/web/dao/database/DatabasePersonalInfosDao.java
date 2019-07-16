@@ -53,9 +53,8 @@ public final class DatabasePersonalInfosDao extends AbstractDao implements Perso
 
     @Override
     public PersonalInfos addPersonalInfos(String address, String name, String phoneNumber, int userId) throws SQLException {
-        boolean autoCommit = connection.getAutoCommit();
-        connection.setAutoCommit(false);
         String sql = "INSERT INTO userInfos(address, name, phoneNumber, userId) VALUES (?, ?, ?, ?)";
+        connection.setAutoCommit(false);
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, address);
             statement.setString(2, name);
@@ -63,49 +62,33 @@ public final class DatabasePersonalInfosDao extends AbstractDao implements Perso
             statement.setInt(4, userId);
             executeInsert(statement);
             int id = fetchGeneratedId(statement);
-            connection.commit();
             return new PersonalInfos(id, address, name, phoneNumber, userId);
         } catch (SQLException ex) {
-            connection.rollback();
             throw ex;
-        } finally {
-            connection.setAutoCommit(autoCommit);
         }
     }
 
     @Override
     public void updateAddressById(int id, String address) throws SQLException {
-        boolean autoCommit = connection.getAutoCommit();
-        connection.setAutoCommit(false);
         String sql = "UPDATE userInfos SET address=? WHERE userId =?";
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, address);
             statement.setInt(2, id);
             executeInsert(statement);
-            connection.commit();
         } catch (SQLException ex) {
-            connection.rollback();
             throw ex;
-        } finally {
-            connection.setAutoCommit(autoCommit);
         }
     }
 
     @Override
     public void updateNameById(int id, String name) throws SQLException {
-        boolean autoCommit = connection.getAutoCommit();
-        connection.setAutoCommit(false);
         String sql = "UPDATE userInfos SET name=? WHERE userId =?";
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, name);
             statement.setInt(2, id);
             executeInsert(statement);
-            connection.commit();
         } catch (SQLException ex) {
-            connection.rollback();
             throw ex;
-        } finally {
-            connection.setAutoCommit(autoCommit);
         }
     }
 

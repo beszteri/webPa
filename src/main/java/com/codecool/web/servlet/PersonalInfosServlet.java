@@ -60,14 +60,14 @@ public class PersonalInfosServlet extends AbstractServlet {
             String name = req.getParameter("name");
             String address = req.getParameter("address");
             String phoneNumber = req.getParameter("phoneNumber");
-
-            if(address != null) {
+            System.out.println(address);
+            if(address != null && !address.equals("")) {
                 personalInfosService.updateAddressById(user.getId(), address);
             }
-            if(name != null) {
+            if(name != null && !name.equals("")) {
                 personalInfosService.updateNameById(user.getId(), name);
             }
-            if(phoneNumber != null) {
+            if(phoneNumber != null && !phoneNumber.equals("")) {
                 personalInfosService.updatePhoneNumberById(user.getId(), phoneNumber);
 
             }

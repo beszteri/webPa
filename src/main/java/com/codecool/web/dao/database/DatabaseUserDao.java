@@ -112,7 +112,7 @@ public final class DatabaseUserDao extends AbstractDao implements UserDao {
             executeInsert(statement);
             connection.commit();
         }catch (SQLException e){
-            connection.rollback();;
+            connection.rollback();
             throw e;
         }finally {
             connection.setAutoCommit(autoCommit);
