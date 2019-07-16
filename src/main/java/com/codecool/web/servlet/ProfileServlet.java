@@ -2,6 +2,7 @@ package com.codecool.web.servlet;
 
 import com.codecool.web.dao.UserDao;
 import com.codecool.web.dao.database.DatabaseUserDao;
+import com.codecool.web.model.Role;
 import com.codecool.web.model.User;
 import com.codecool.web.service.PasswordService;
 import com.codecool.web.service.UserService;
@@ -29,14 +30,13 @@ public final class ProfileServlet extends AbstractServlet {
             UserDao userDao = new DatabaseUserDao(connection);
             UserService userService = new SimpleUserService(userDao);
 
-            //User user = (User) request.getSession().getAttribute("user");
-             int userId = Integer.parseInt(request.getParameter("userId"));
-           // int userId = user.getId();
+            User user = (User) request.getSession().getAttribute("user");
+            int userId = user.getId();
+            System.out.println(userId + request.getParameter("email"));
 
             sendMessage(response, HttpServletResponse.SC_OK, userService.findById(userId));
         } catch (SQLException exc) {
             handleSqlError(response, exc);
         }
     }
-
 }

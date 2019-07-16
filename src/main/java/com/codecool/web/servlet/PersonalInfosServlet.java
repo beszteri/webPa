@@ -36,18 +36,13 @@ public class PersonalInfosServlet extends AbstractServlet {
             PersonalInfosService personalInfosService = new SimplePersonalInfosService(personalInfosDao);
 
             User user = (User) request.getSession().getAttribute("user");
+
             int userId = user.getId();
-            System.out.println(userId);
             if(!personalInfosDao.findIfPersonalInfosExist(userId)){
                 personalInfosDao.addPersonalInfos("unknown", "unkown", "unkown", userId);
-                System.out.println("personalinfos létrehozva  /n /n");
                 PersonalInfos personalInfos = personalInfosService.findByUserId(userId);
-
-                System.out.println(personalInfos.getAddress() + "belul cim");
             }
             PersonalInfos personalInfos = personalInfosService.findByUserId(userId);
-            System.out.println(personalInfos.getAddress() + " kivul cim");
-
             sendMessage(response, HttpServletResponse.SC_OK, personalInfos);
         } catch (SQLException exc) {
             handleSqlError(response, exc);

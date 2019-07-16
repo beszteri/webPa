@@ -1,6 +1,6 @@
 function onGuestButtonClicked() {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'protected/games');
+    xhr.open('POST', 'guest');
     xhr.onload = function () {
         if (this.status == OK) {
             let games = JSON.parse(this.responseText);
@@ -12,7 +12,6 @@ function onGuestButtonClicked() {
                     '<li>Name: ' + games[i].name + '</li>' +
                     '<li>Platform: ' + games[i].platform + '</li>' +
                     '<li>Price: ' + games[i].price + '</li>' +
-                    '<li><button id="buy-game" content="' + games[i].id + '">Buy game</button> </li>' +
                     '</ul>' +
                     '</div>';
             }

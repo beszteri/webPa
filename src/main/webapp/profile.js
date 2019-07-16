@@ -1,6 +1,6 @@
 function onProfileButtonClicked() {
+
     const xhr = new XMLHttpRequest();
-    xhr.addEventListener('load', onProfileLoadResponse);
     xhr.addEventListener('error', onNetworkError);
     xhr.open('GET', 'protected/personalInfos');
     xhr.onload = function () {
@@ -54,13 +54,3 @@ function onChangeProfileInfosRespond() {
     //}
 }
 
-function onProfileLoadResponse() {
-    if (this.status === OK) {
-        const user = JSON.parse(this.responseText);
-       // setAuthorization(user);
-        //showContents(['welcome-content', 'profile-content']);
-        onProfileLoad(user);
-    } //else {
-        //onOtherResponse(document.getElementById('login-form'), this);
-   // }
-}
